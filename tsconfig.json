@@ -1,0 +1,10 @@
+{
+    "extends": "./tsconfig.common",
+    "include": ["**/*"],
+    "exclude": [
+        "node_modules",
+        "**/node_modules/**",
+        "jest.config.js",
+        "dist",
+    ]
+}
