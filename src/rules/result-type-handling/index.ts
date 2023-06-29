@@ -1,1 +1,1 @@
-export default "./rule";
+export { default } from "./rule";
