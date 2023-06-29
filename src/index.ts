@@ -1,7 +1,5 @@
-import resulTypetHandling from "./result-type-handling";
+import rules from "./rules";
 
 export = {
-  rules: {
-    "result-type-handling": resulTypetHandling,
-  },
+  rules,
 };

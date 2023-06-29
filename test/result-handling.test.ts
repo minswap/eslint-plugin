@@ -4,7 +4,7 @@ const ruleTester = new ESLintUtils.RuleTester({
   parser: "@typescript-eslint/parser",
 });
 
-import resultTypeHandlingRule from "../src/result-type-handling";
+import resultTypeHandlingRule from "../src/rules/result-type-handling/rule";
 
 const resultTypeDeclaration = `
   export type Ok<T> = { type: "ok"; value: T };
