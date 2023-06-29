@@ -7,7 +7,7 @@ export const createRule = ESLintUtils.RuleCreator(
   (name) => `https://typescript-eslint.io/rules/${name}`
 );
 
-const RESULT_PROPERTIES = ["ok", "err", "unwrap"];
+const RESULT_PROPERTIES = ["ok", "err"];
 
 const RESULT_TYPES = ["Ok", "Err"];
 
@@ -20,7 +20,7 @@ export default createRule({
     docs: {
       description:
         "Require that function calling functions that return a Result type must handle the result",
-      recommended: "error",
+      recommended: "warn",
     },
     schema: [],
     messages: {
@@ -99,7 +99,6 @@ export default createRule({
                 doesUnwrap(statement, variableName)
               );
 
-              // TODO: check for ternary operator
               const doesResultTypeCheck = restStatements.some((statement) =>
                 isResultTypeCheck(statement, variableName)
               );
@@ -148,25 +147,64 @@ function isResultTypeCheck(
   statement: TSESTree.Statement,
   variableName: string
 ): boolean {
+  // TODO: Add switch case
+  const binaryExpr = getBinaryExpression(statement);
+  if (binaryExpr) {
+    const { left, right } = binaryExpr;
+    if (
+      isMemberExpressionIdentifier(left, variableName) &&
+      isLiteralWithResultProperty(right)
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function getBinaryExpression(statement: TSESTree.Statement): {
+  left: TSESTree.Expression | TSESTree.PrivateIdentifier;
+  right: TSESTree.Expression;
+} | null {
   if (
     statement.type === AST_NODE_TYPES.IfStatement &&
     statement.test.type === AST_NODE_TYPES.BinaryExpression
   ) {
-    const left = statement.test.left;
-    const right = statement.test.right;
+    return {
+      left: statement.test.left,
+      right: statement.test.right,
+    };
+  } else if (statement.type === AST_NODE_TYPES.VariableDeclaration) {
+    const declaration = statement.declarations[0].init;
     if (
-      left.type === AST_NODE_TYPES.MemberExpression &&
-      left.object.type === AST_NODE_TYPES.Identifier &&
-      left.object.name === variableName
+      declaration &&
+      declaration.type === AST_NODE_TYPES.ConditionalExpression &&
+      declaration.test.type === AST_NODE_TYPES.BinaryExpression
     ) {
-      if (
-        right.type === AST_NODE_TYPES.Literal &&
-        RESULT_PROPERTIES.some((resultPropery) => resultPropery === right.value)
-      )
-        return true;
+      return { left: declaration.test.left, right: declaration.test.right };
     }
   }
-  return false;
+  return null;
+}
+
+function isMemberExpressionIdentifier(
+  node: TSESTree.Node,
+  name: string
+): boolean {
+  return (
+    node.type === AST_NODE_TYPES.MemberExpression &&
+    node.object.type === AST_NODE_TYPES.Identifier &&
+    node.object.name === name &&
+    node.property.type === AST_NODE_TYPES.Identifier &&
+    node.property.name === "type"
+  );
+}
+
+function isLiteralWithResultProperty(node: TSESTree.Node): boolean {
+  return (
+    node.type === AST_NODE_TYPES.Literal &&
+    typeof node.value === "string" &&
+    RESULT_PROPERTIES.includes(node.value)
+  );
 }
 
 function getParent(node: TSESTree.Node): TSESTree.Node | undefined {
@@ -233,7 +271,7 @@ const isUnwrapCallExpr = (node: TSESTree.CallExpression): boolean => {
       if (node.callee.object.name === RESULT_TYPE_NAME) {
         if (node.callee.property.type === AST_NODE_TYPES.Identifier) {
           const propertyName = node.callee.property.name;
-          if (propertyName === RESULT_PROPERTIES[2]) {
+          if (propertyName === "unwrap") {
             return true;
           }
         }
@@ -265,7 +303,7 @@ function isUnwrapStatment(
     statement.expression.callee.object.type === AST_NODE_TYPES.Identifier &&
     statement.expression.callee.object.name === RESULT_TYPE_NAME &&
     statement.expression.callee.property.type === AST_NODE_TYPES.Identifier &&
-    statement.expression.callee.property.name === RESULT_PROPERTIES[2] &&
+    statement.expression.callee.property.name === "unwrap" &&
     statement.expression.arguments.length === 1 &&
     statement.expression.arguments[0].type === AST_NODE_TYPES.Identifier &&
     statement.expression.arguments[0].name === variableName

@@ -40,39 +40,39 @@ const wrapResultDeclaration = (code: string) => `
 
 ruleTester.run("result handling", resultTypeHandlingRule, {
   valid: [
-    // resultTypeDeclaration,
-    // wrapResultDeclaration(`
-    //   function test2() {
-    //     const res = Result.unwrap(getResult(0))
-    //     return res
-    //   }
-    // `),
-    // wrapResultDeclaration(`
-    //   function test3() {
-    //     return Result.unwrap(getResult(0))
-    //   }
-    // `),
-    // wrapResultDeclaration(`
-    //   function test4() {
-    //     const res = getResult(0)
-    //     Result.unwrap(res)
-    //     return 2
-    //   }
-    // `),
-    // wrapResultDeclaration(`
-    //   function test5() {
-    //     const res = getResult(0)
-    //     const foo = 1
-    //     const bar = Result.unwrap(res)
-    //     return bar
-    //   }
-    // `),
-    // wrapResultDeclaration(`
-    //   function test6() {
-    //     const res = getResult()
-    //     return res
-    //   }
-    // `),
+    resultTypeDeclaration,
+    wrapResultDeclaration(`
+      function test2() {
+        const res = Result.unwrap(getResult(0))
+        return res
+      }
+    `),
+    wrapResultDeclaration(`
+      function test3() {
+        return Result.unwrap(getResult(0))
+      }
+    `),
+    wrapResultDeclaration(`
+      function test4() {
+        const res = getResult(0)
+        Result.unwrap(res)
+        return 2
+      }
+    `),
+    wrapResultDeclaration(`
+      function test5() {
+        const res = getResult(0)
+        const foo = 1
+        const bar = Result.unwrap(res)
+        return bar
+      }
+    `),
+    wrapResultDeclaration(`
+      function test6() {
+        const res = getResult()
+        return res
+      }
+    `),
     wrapResultDeclaration(`
       function test7() {
         const res = getResult()
@@ -82,35 +82,42 @@ ruleTester.run("result handling", resultTypeHandlingRule, {
         throw new Error(res.value)
       }
     `),
-    //   wrapResultDeclaration(`
-    //     function test8() {
-    //       return getResult()
-    //     }
-    //   `),
-    //   wrapResultDeclaration(`
-    //     function test1() { return 1 }
-    //     test1()
-    //   `),
-    //   wrapResultDeclaration(`
-    //   function getFakeResult() {
-    //     return 1
-    //   }
-    //   function test() {
-    //     const res = getFakeResult()
-    //     return res
-    //   }
-    // `),
+    wrapResultDeclaration(`
+        function test8() {
+          return getResult()
+        }
+      `),
+    wrapResultDeclaration(`
+        function test10() { return 1 }
+        test1()
+      `),
+    wrapResultDeclaration(`
+      function getFakeResult() {
+        return 1
+      }
+      function test11() {
+        const res = getFakeResult()
+        return res
+      }
+    `),
+    wrapResultDeclaration(`
+    function test12() {
+      const res = getResult()
+      const a = res.type === "err" ? res.error : res.value;
+      return a
+    }
+  `),
   ],
   invalid: [
-    // {
-    //   code: wrapResultDeclaration(`
-    //   function test9() {
-    //     const foo = 1
-    //     getResult()
-    //     return foo
-    //   }
-    // `),
-    //   errors: [{ messageId: "resultHandling" }],
-    // },
+    {
+      code: wrapResultDeclaration(`
+      function test9() {
+        const foo = 1
+        getResult()
+        return foo
+      }
+    `),
+      errors: [{ messageId: "resultHandling" }],
+    },
   ],
 });
