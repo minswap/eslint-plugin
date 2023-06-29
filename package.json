@@ -1,6 +1,6 @@
 {
   "name": "@minswap/eslint-plugin",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Custom set of eslint rules for Minswap Labs",
   "main": "dist/index.js",
   "scripts": {

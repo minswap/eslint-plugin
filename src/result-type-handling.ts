@@ -7,16 +7,19 @@ export const createRule = ESLintUtils.RuleCreator(
   (name) => `https://typescript-eslint.io/rules/${name}`
 );
 
-const RESULT_PROPERTIES = ["ok", "err"];
+const RESULT_PROPERTIES = ["ok", "err", "unwrap"];
 
 const RESULT_TYPES = ["Ok", "Err"];
+
+const RESULT_TYPE_NAME = "Result";
 
 export default createRule({
   name: "result-type-handing",
   meta: {
     type: "suggestion",
     docs: {
-      description: "Require that function overload signatures be consecutive",
+      description:
+        "Require that function calling functions that return a Result type must handle the result",
       recommended: "error",
     },
     schema: [],
@@ -97,25 +100,19 @@ export default createRule({
               );
 
               // TODO: check for ternary operator
-              const doesConditionCheck = restStatements.some(
-                (statement) =>
-                  statement.type === "IfStatement" &&
-                  statement.test.type === "BinaryExpression" &&
-                  statement.test.left.type === "Identifier" &&
-                  statement.test.left.name === variableName &&
-                  statement.test.right.type === "Literal" &&
-                  statement.test.right.value === "condition"
+              const doesResultTypeCheck = restStatements.some((statement) =>
+                isResultTypeCheck(statement, variableName)
               );
 
               // see test6() in test/result-handling.test.ts
               const doesReturn = restStatements.some(
                 (statement) =>
-                  statement.type === "ReturnStatement" &&
-                  statement.argument?.type === "Identifier" &&
+                  statement.type === AST_NODE_TYPES.ReturnStatement &&
+                  statement.argument?.type === AST_NODE_TYPES.Identifier &&
                   statement.argument.name === variableName
               );
 
-              if (!unwrap && !doesReturn && !doesConditionCheck) {
+              if (!unwrap && !doesReturn && !doesResultTypeCheck) {
                 context.report({
                   node,
                   messageId: "resultHandling",
@@ -146,6 +143,31 @@ export default createRule({
 });
 
 /** Utilities */
+
+function isResultTypeCheck(
+  statement: TSESTree.Statement,
+  variableName: string
+): boolean {
+  if (
+    statement.type === AST_NODE_TYPES.IfStatement &&
+    statement.test.type === AST_NODE_TYPES.BinaryExpression
+  ) {
+    const left = statement.test.left;
+    const right = statement.test.right;
+    if (
+      left.type === AST_NODE_TYPES.MemberExpression &&
+      left.object.type === AST_NODE_TYPES.Identifier &&
+      left.object.name === variableName
+    ) {
+      if (
+        right.type === AST_NODE_TYPES.Literal &&
+        RESULT_PROPERTIES.some((resultPropery) => resultPropery === right.value)
+      )
+        return true;
+    }
+  }
+  return false;
+}
 
 function getParent(node: TSESTree.Node): TSESTree.Node | undefined {
   return node.parent;
@@ -180,7 +202,7 @@ function getVariableName(node: TSESTree.Node | undefined): string | undefined {
 const isOkOrErr = (node: TSESTree.CallExpression): boolean => {
   if (node.callee.type === AST_NODE_TYPES.MemberExpression) {
     if (node.callee.object.type === AST_NODE_TYPES.Identifier) {
-      if (node.callee.object.name === "Result") {
+      if (node.callee.object.name === RESULT_TYPE_NAME) {
         if (node.callee.property.type === AST_NODE_TYPES.Identifier) {
           const propertyName = node.callee.property.name;
           if (
@@ -208,10 +230,10 @@ function isParentUnwrapCallExpr(node: TSESTree.CallExpression): boolean {
 const isUnwrapCallExpr = (node: TSESTree.CallExpression): boolean => {
   if (node.callee.type === AST_NODE_TYPES.MemberExpression) {
     if (node.callee.object.type === AST_NODE_TYPES.Identifier) {
-      if (node.callee.object.name === "Result") {
+      if (node.callee.object.name === RESULT_TYPE_NAME) {
         if (node.callee.property.type === AST_NODE_TYPES.Identifier) {
           const propertyName = node.callee.property.name;
-          if (propertyName === "unwrap") {
+          if (propertyName === RESULT_PROPERTIES[2]) {
             return true;
           }
         }
@@ -241,9 +263,9 @@ function isUnwrapStatment(
     statement.expression.type === AST_NODE_TYPES.CallExpression &&
     statement.expression.callee.type === AST_NODE_TYPES.MemberExpression &&
     statement.expression.callee.object.type === AST_NODE_TYPES.Identifier &&
-    statement.expression.callee.object.name === "Result" &&
+    statement.expression.callee.object.name === RESULT_TYPE_NAME &&
     statement.expression.callee.property.type === AST_NODE_TYPES.Identifier &&
-    statement.expression.callee.property.name === "unwrap" &&
+    statement.expression.callee.property.name === RESULT_PROPERTIES[2] &&
     statement.expression.arguments.length === 1 &&
     statement.expression.arguments[0].type === AST_NODE_TYPES.Identifier &&
     statement.expression.arguments[0].name === variableName
