@@ -40,7 +40,7 @@ const wrapResultDeclaration = (code: string) => `
 
 ruleTester.run("result handling", resultTypeHandlingRule, {
   valid: [
-    wrapResultDeclaration(``),
+    resultTypeDeclaration,
     wrapResultDeclaration(`
       function test2() {
         const res = Result.unwrap(getResult(0))

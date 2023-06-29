@@ -1,7 +1,7 @@
-import resultHandling from "./result-type-handling";
+import resulTypetHandling from "./result-type-handling";
 
 export = {
   rules: {
-    "result-type-handling": resultHandling,
+    "result-type-handling": resulTypetHandling,
   },
 };

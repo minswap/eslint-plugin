@@ -12,7 +12,7 @@ const RESULT_PROPERTIES = ["ok", "err"];
 const RESULT_TYPES = ["Ok", "Err"];
 
 export default createRule({
-  name: "result-handling",
+  name: "result-type-handing",
   meta: {
     type: "suggestion",
     docs: {
@@ -280,7 +280,9 @@ function getCallExpressionReturnType(
   );
 
   // Get the return type of the CallExpression
-  const returnType = type.getCallSignatures()[0].getReturnType();
+  const typeSignatures = type.getCallSignatures();
+  if (typeSignatures.length === 0) return null;
+  const returnType = typeSignatures[0].getReturnType();
 
   return typeChecker.typeToString(returnType);
 }
