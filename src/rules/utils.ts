@@ -5,8 +5,9 @@ import {
   ESLintUtils,
 } from "@typescript-eslint/utils";
 
+// fake url for now
 export const createRule = ESLintUtils.RuleCreator(
-  (name) => `https://typescript-eslint.io/rules/${name}`
+  (name) => `https://eslint.minswap.org/rules/${name}`
 );
 
 export function getBinaryExpression(statement: TSESTree.Statement): {
