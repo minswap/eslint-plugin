@@ -85,7 +85,10 @@ export function findParentFunctionBody(
   let currentNode: TSESTree.Node | undefined = node.parent;
   while (currentNode) {
     // TODO: Add support for arrow functions
-    if (currentNode.type === AST_NODE_TYPES.BlockStatement) {
+    if (
+      currentNode.type === AST_NODE_TYPES.BlockStatement ||
+      currentNode.type === AST_NODE_TYPES.Program
+    ) {
       return currentNode.body;
     }
     currentNode = currentNode.parent;
@@ -109,4 +112,39 @@ export function getCallExpressionReturnType(
   const returnType = typeSignatures[0].getReturnType();
 
   return typeChecker.typeToString(returnType);
+}
+
+export function getVariableDeclaration(
+  statements: TSESTree.Statement[],
+  variableName: string
+): TSESTree.VariableDeclarator | undefined {
+  for (const statement of statements) {
+    if (
+      statement.type === TSESTree.AST_NODE_TYPES.VariableDeclaration &&
+      statement.declarations.length > 0
+    ) {
+      const declaration = statement.declarations[0];
+      if (declaration.type === AST_NODE_TYPES.VariableDeclarator) {
+        if (declaration.id.type === AST_NODE_TYPES.Identifier) {
+          if (declaration.id.name === variableName) {
+            return declaration;
+          }
+        }
+      }
+    }
+  }
+  return undefined;
+}
+
+export function getVariableType(
+  statements: TSESTree.Statement[],
+  variableName: string
+): string | null {
+  const declaration = getVariableDeclaration(statements, variableName);
+  if (declaration) {
+    if (declaration.init) {
+      return declaration.init.type;
+    }
+  }
+  return null;
 }
