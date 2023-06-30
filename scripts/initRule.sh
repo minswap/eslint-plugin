@@ -5,8 +5,11 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
+here="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
+root="$(cd "$here/.." && pwd)"
+
 # Default path where the directory will be created
-path="../src/rules"
+rule_path="$root/src/rules"
 
 while [[ $# -gt 0 ]]; do
   key="$1"
@@ -38,18 +41,25 @@ if [ -z "$rule_name" ]; then
   exit 1
 fi
 
-echo $rule_name
-echo $description
-echo $result
+# hypen separated string to camel case
+messageId=""
+IFS="-" read -ra words <<< "$rule_name"
+for ((i=0; i<${#words[@]}; i++)); do
+  if [ $i -ne 0 ]; then
+    messageId+="$(tr '[:lower:]' '[:upper:]' <<< ${words[$i]:0:1})${words[$i]:1}"
+  else
+    messageId+="${words[$i]}"
+  fi
+done
 
 # Create the directory
-mkdir -p "$path/$rule_name"
+mkdir -p "$rule_path/$rule_name"
 
 # Create index.ts file with content
-echo 'export { default } from "./rule";' > "$path/$rule_name/index.ts"
+echo 'export { default } from "./rule";' > "$rule_path/$rule_name/index.ts"
 
 
-cat <<EOF > "$path/$rule_name/rule.ts"
+cat <<EOF > "$rule_path/$rule_name/rule.ts"
 import { createRule } from "../utils";
 
 export default createRule({
@@ -63,7 +73,7 @@ export default createRule({
     },
     schema: [],
     messages: {
-      resultHandling: "$message",
+      "$messageId": "$message",
     },
   },
   defaultOptions: [],
@@ -74,3 +84,13 @@ export default createRule({
 EOF
 
 echo "Directory '$rule_name' created at '$path'."
+
+rule_import_name_suffix="Rule"
+
+index_path="$root/src/index.ts"  # Specify the path to your TypeScript file here
+import_statement="import { $messageId$rule_import_name_suffix } from './$rule_name';"  
+
+# Find the last import statement in the file
+last_import_line=$(grep -n "^\s*import\s" "$index_path" | tail -n 1 | cut -d ":" -f 1)
+
+sed -i "$last_import_line"'a\'"$import_statement_to_add" "$index_path"
