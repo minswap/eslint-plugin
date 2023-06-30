@@ -52,12 +52,9 @@ for ((i=0; i<${#words[@]}; i++)); do
   fi
 done
 
-# Create the directory
 mkdir -p "$rule_path/$rule_name"
 
-# Create index.ts file with content
 echo 'export { default } from "./rule";' > "$rule_path/$rule_name/index.ts"
-
 
 cat <<EOF > "$rule_path/$rule_name/rule.ts"
 import { createRule } from "../utils";
@@ -87,10 +84,11 @@ echo "Directory '$rule_name' created at '$path'."
 
 rule_import_name_suffix="Rule"
 
-index_path="$root/src/index.ts"  # Specify the path to your TypeScript file here
+index_path="$root/src/index.ts"  
 import_statement="import { $messageId$rule_import_name_suffix } from './$rule_name';"  
 
-# Find the last import statement in the file
 last_import_line=$(grep -n "^\s*import\s" "$index_path" | tail -n 1 | cut -d ":" -f 1)
 
 sed -i "$last_import_line"'a\'"$import_statement_to_add" "$index_path"
+
+echo "Import statement added to '$index_path'. Please add the rule to the rules array."

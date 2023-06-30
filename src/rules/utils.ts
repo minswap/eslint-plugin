@@ -136,16 +136,3 @@ export function getVariableDeclaration(
   }
   return undefined;
 }
-
-export function getVariableType(
-  statements: TSESTree.Statement[],
-  variableName: string
-): string | null {
-  const declaration = getVariableDeclaration(statements, variableName);
-  if (declaration) {
-    if (declaration.init) {
-      return declaration.init.type;
-    }
-  }
-  return null;
-}
