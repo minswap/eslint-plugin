@@ -2,7 +2,12 @@ import {
   TSESTree,
   AST_NODE_TYPES,
   ParserServices,
+  ESLintUtils,
 } from "@typescript-eslint/utils";
+
+export const createRule = ESLintUtils.RuleCreator(
+  (name) => `https://typescript-eslint.io/rules/${name}`
+);
 
 export function getBinaryExpression(statement: TSESTree.Statement): {
   left: TSESTree.Expression | TSESTree.PrivateIdentifier;
