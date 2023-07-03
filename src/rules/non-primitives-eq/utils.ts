@@ -3,7 +3,6 @@ import { findParentFunctionBody, getVariableDeclaration } from "../utils";
 
 export function isNonPrimitiveComparison(node: TSESTree.Node) {
   let isNonPrimitive = false;
-  console.log(node);
   if (
     node.type === AST_NODE_TYPES.BinaryExpression &&
     (node.operator === "===" || node.operator === "==")
