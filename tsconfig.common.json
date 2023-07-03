@@ -13,7 +13,7 @@
         // "isolatedModules": true,               /* Transpile each file as a separate module (similar to 'ts.transpileModule'). */
 
         /* Strict Type-Checking Options */
-        "strict": false /* Enable all strict type-checking connections. */,
+        "strict": true /* Enable all strict type-checking connections. */,
         "noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
         "strictNullChecks": true /* Enable strict null checks. */,
         // "strictFunctionTypes": true,           /* Enable strict checking of function types. */
@@ -29,7 +29,7 @@
         "skipLibCheck": true /* Skip type checking of all declaration files (*.d.ts). */,
         "skipDefaultLibCheck": true,
         "resolveJsonModule": true /* Allow importing of .JSON modules */,
-        "allowJs": true,
+        "allowJs": false,
         /* ModuleMock Resolution Options */
         "moduleResolution": "node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
         // "baseUrl": "./",                       /* Base directory to resolve non-absolute module names. */

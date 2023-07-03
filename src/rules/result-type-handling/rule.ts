@@ -1,22 +1,19 @@
-import { AST_NODE_TYPES, ESLintUtils } from "@typescript-eslint/utils";
+import { AST_NODE_TYPES } from "@typescript-eslint/utils";
 import {
-  getParent,
+  createRule,
   findParentFunctionBody,
-  isVariableDeclaration,
+  getParent,
   isReturnStatement,
+  isVariableDeclaration,
 } from "../utils";
 import {
-  isOkOrErr,
-  isUnwrapCallExpr,
-  isResultType,
-  isParentUnwrapCallExpr,
   doesUnwrap,
+  isOkOrErr,
+  isParentUnwrapCallExpr,
+  isResultType,
   isResultTypeCheck,
+  isUnwrapCallExpr,
 } from "./utils";
-
-export const createRule = ESLintUtils.RuleCreator(
-  (name) => `https://typescript-eslint.io/rules/${name}`
-);
 
 export default createRule({
   name: "result-type-handing",
