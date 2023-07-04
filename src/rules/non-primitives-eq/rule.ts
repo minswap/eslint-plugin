@@ -19,20 +19,10 @@ export default createRule({
   defaultOptions: [],
   create(context) {
     return {
-      IfStatement(node) {
-        const test = node.test;
-        if (isNonPrimitiveComparison(test)) {
+      BinaryExpression(node) {
+        if (isNonPrimitiveComparison(node)) {
           context.report({
-            node: test,
-            messageId: "nonPrimitivesEq",
-          });
-        }
-      },
-      ConditionalExpression(node) {
-        const test = node.test;
-        if (isNonPrimitiveComparison(test)) {
-          context.report({
-            node: test,
+            node,
             messageId: "nonPrimitivesEq",
           });
         }

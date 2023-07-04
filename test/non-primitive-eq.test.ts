@@ -88,5 +88,37 @@ ruleTester.run("non primitives equality", nonPrimitiveEqRule, {
               `,
       errors: [{ messageId: "nonPrimitivesEq" }],
     },
+    {
+      code: `
+        class Asset {
+          private id: string
+          constructor(id: string) {
+            this.id = id
+          }
+        }
+        const asset = new Asset('1')
+        const anotherAsset = new Asset('2')
+        if(asset === anotherAsset) {
+          // do something
+        }
+        `,
+      errors: [{ messageId: "nonPrimitivesEq" }],
+    },
+    {
+      code: `
+        class Asset {
+          private id: string
+          constructor(id: string) {
+            this.id = id
+          }
+        }
+        const asset = new Asset('1')
+        const anotherAsset = new Asset('2')
+        if(1 === 1 || asset === anotherAsset || 1 !== 2) {
+          // do something
+        }
+        `,
+      errors: [{ messageId: "nonPrimitivesEq" }],
+    },
   ],
 });

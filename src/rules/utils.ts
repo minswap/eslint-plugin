@@ -116,10 +116,10 @@ export function getCallExpressionReturnType(
 }
 
 export function getVariableDeclaration(
-  statements: TSESTree.Statement[],
+  functionBody: TSESTree.Statement[],
   variableName: string
 ): TSESTree.VariableDeclarator | undefined {
-  for (const statement of statements) {
+  for (const statement of functionBody) {
     if (
       statement.type === TSESTree.AST_NODE_TYPES.VariableDeclaration &&
       statement.declarations.length > 0

@@ -1,12 +1,9 @@
 import { AST_NODE_TYPES, TSESTree } from "@typescript-eslint/utils";
 import { findParentFunctionBody, getVariableDeclaration } from "../utils";
 
-export function isNonPrimitiveComparison(node: TSESTree.Node) {
+export function isNonPrimitiveComparison(node: TSESTree.BinaryExpression) {
   let isNonPrimitive = false;
-  if (
-    node.type === AST_NODE_TYPES.BinaryExpression &&
-    (node.operator === "===" || node.operator === "==")
-  ) {
+  if (node.operator === "===" || node.operator === "==") {
     const left = node.left;
     const functionBody = findParentFunctionBody(node);
     if (functionBody) {
@@ -40,7 +37,8 @@ export function isNonPrimitiveType(
       const type = declaration.init.type;
       return (
         type === AST_NODE_TYPES.ArrayExpression ||
-        type === AST_NODE_TYPES.ObjectExpression
+        type === AST_NODE_TYPES.ObjectExpression ||
+        type === AST_NODE_TYPES.NewExpression
       );
     }
   }
