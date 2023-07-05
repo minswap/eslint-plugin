@@ -51,7 +51,7 @@ Use script `scripts/pack.sh`. It automates the process of bumping npm package ve
 4. Install this package:
 
    ```
-       npm i -D <path>/minswap-eslint-plugin-1.0.4913.tgz
+   npm i -D <path>/minswap-eslint-plugin-1.0.4913.tgz
    ```
 
 The scripts always randomizes the patch version with 4 digit random number. Copy the 4 digit number and paste in package.json to path where this plugin was installed for testing for easy updates.
