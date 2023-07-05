@@ -1,5 +1,5 @@
-import resultTypeHandlingRule from "./result-type-handling";
 import nonPrimitiveEqRule from "./non-primitives-eq";
+import resultTypeHandlingRule from "./result-type-handling";
 
 export default {
   rules: {

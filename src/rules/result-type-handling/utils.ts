@@ -1,9 +1,4 @@
 import { AST_NODE_TYPES, TSESTree } from "@typescript-eslint/utils";
-import {
-  getBinaryExpression,
-  getCallExpressionReturnType,
-  isMemberExpressionIdentifier,
-} from "../utils";
 import { RuleContext } from "@typescript-eslint/utils/dist/ts-eslint";
 
 export const RESULT_TYPE_NAME = "Result";
@@ -12,18 +7,12 @@ const resultPropertyRegex = /^(ok|err)$/;
 
 const resultTypeRegex = /^(Result<.*, .*>|Err<\w+>\s\|\sOk<\w+>)$/;
 
-export function isResultTypeCheck(
-  statement: TSESTree.Statement,
-  variableName: string
-): boolean {
+export function isResultTypeCheck(statement: TSESTree.Statement, variableName: string): boolean {
   // TODO: Add switch case
   const binaryExpr = getBinaryExpression(statement);
   if (binaryExpr) {
     const { left, right } = binaryExpr;
-    if (
-      isMemberExpressionIdentifier(left, variableName) &&
-      isLiteralWithResultProperty(right)
-    ) {
+    if (isMemberExpressionIdentifier(left, variableName) && isLiteralWithResultProperty(right)) {
       return true;
     }
   }
@@ -75,10 +64,7 @@ export function isUnwrapCallExpr(node: TSESTree.CallExpression): boolean {
   return false;
 }
 
-export function doesUnwrap(
-  node: TSESTree.Statement,
-  variableName: string
-): boolean {
+export function doesUnwrap(node: TSESTree.Statement, variableName: string): boolean {
   let unwrapStatement = isUnwrapStatment(node, variableName);
   if (node.type === AST_NODE_TYPES.VariableDeclaration) {
     const declaration = node.declarations[0].init;
@@ -89,10 +75,7 @@ export function doesUnwrap(
   return unwrapStatement;
 }
 
-export function isUnwrapStatment(
-  statement: TSESTree.Statement,
-  variableName: string
-): boolean {
+export function isUnwrapStatment(statement: TSESTree.Statement, variableName: string): boolean {
   return (
     statement.type === AST_NODE_TYPES.ExpressionStatement &&
     statement.expression.type === AST_NODE_TYPES.CallExpression &&
@@ -109,7 +92,7 @@ export function isUnwrapStatment(
 
 export function isResultType(
   context: Readonly<RuleContext<"resultHandling", never[]>>,
-  node: TSESTree.CallExpression
+  node: TSESTree.CallExpression,
 ): boolean {
   const returnType = getCallExpressionReturnType(context, node);
   if (returnType && resultTypeRegex.test(returnType)) {
