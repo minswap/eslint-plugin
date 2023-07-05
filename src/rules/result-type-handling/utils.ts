@@ -111,11 +111,7 @@ export function isResultType(
   context: Readonly<RuleContext<"resultHandling", never[]>>,
   node: TSESTree.CallExpression
 ): boolean {
-  const parserServices = context.parserServices;
-  if (!parserServices || !parserServices.program) {
-    return false;
-  }
-  const returnType = getCallExpressionReturnType(parserServices, node);
+  const returnType = getCallExpressionReturnType(context, node);
   if (returnType && resultTypeRegex.test(returnType)) {
     return true;
   }
