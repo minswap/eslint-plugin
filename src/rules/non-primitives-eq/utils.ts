@@ -1,46 +1,61 @@
-import { AST_NODE_TYPES, TSESTree } from "@typescript-eslint/utils";
-import { findParentFunctionBody, getVariableDeclaration } from "../utils";
+import { TSESTree } from "@typescript-eslint/utils";
+import ts from "typescript";
+import { getParserServices } from "../utils";
 
-export function isNonPrimitiveComparison(node: TSESTree.BinaryExpression) {
+import { RuleContext } from "@typescript-eslint/utils/dist/ts-eslint";
+
+export function isNonPrimitiveComparison(
+  node: TSESTree.BinaryExpression,
+  context: RuleContext<string, unknown[]>
+) {
   let isNonPrimitive = false;
-  if (node.operator === "===" || node.operator === "==") {
+  const parserServices = getParserServices(context);
+  if (!parserServices) return false;
+  const typeChecker = parserServices.program.getTypeChecker();
+
+  if (
+    node.operator === "===" ||
+    node.operator === "==" ||
+    node.operator === "!==" ||
+    node.operator === "!="
+  ) {
     const left = node.left;
-    const functionBody = findParentFunctionBody(node);
-    if (functionBody) {
-      if (left.type === "Identifier") {
-        const variableDeclaration = getVariableDeclaration(
-          functionBody,
-          left.name
-        );
-        isNonPrimitive = isNonPrimitiveType(variableDeclaration);
-      }
-      if (!isNonPrimitive) {
-        const right = node.right;
-        if (right.type === "Identifier") {
-          const variableDeclaration = getVariableDeclaration(
-            functionBody,
-            right.name
-          );
-          isNonPrimitive = isNonPrimitiveType(variableDeclaration);
-        }
-      }
+    const leftType = typeChecker.getTypeAtLocation(
+      parserServices.esTreeNodeToTSNodeMap.get(left)
+    );
+    const right = node.right;
+    const rightType = typeChecker.getTypeAtLocation(
+      parserServices.esTreeNodeToTSNodeMap.get(right)
+    );
+    // check if either side is an object/array
+    isNonPrimitive =
+      isNonPrimitiveType(leftType) || isNonPrimitiveType(rightType);
+    if (isNonPrimitive) {
+      // check if both sides are not undefined/null/never/any/unknown/union
+      // bc obj !== null can be a valid comparison
+      isNonPrimitive =
+        !isSafeNonPrimitiveCheck(leftType) &&
+        !isSafeNonPrimitiveCheck(rightType);
     }
   }
   return isNonPrimitive;
 }
 
-export function isNonPrimitiveType(
-  declaration: TSESTree.VariableDeclarator | undefined
-): boolean {
-  if (declaration) {
-    if (declaration.init) {
-      const type = declaration.init.type;
-      return (
-        type === AST_NODE_TYPES.ArrayExpression ||
-        type === AST_NODE_TYPES.ObjectExpression ||
-        type === AST_NODE_TYPES.NewExpression
-      );
-    }
-  }
-  return false;
+const NON_PRIMITIVE_TYPES = [ts.TypeFlags.Object, ts.TypeFlags.Index];
+
+const SAFE_NON_PRIMITIVE_CHECK = [
+  ts.TypeFlags.Undefined,
+  ts.TypeFlags.Null,
+  ts.TypeFlags.Never,
+  ts.TypeFlags.Any,
+  ts.TypeFlags.Unknown,
+  ts.TypeFlags.Union, // TODO: scope for improvement (currently we ignore if either side is a union)
+];
+
+function isNonPrimitiveType(type: ts.Type): boolean {
+  return NON_PRIMITIVE_TYPES.some((flag) => type.flags === flag);
+}
+
+function isSafeNonPrimitiveCheck(type: ts.Type): boolean {
+  return SAFE_NON_PRIMITIVE_CHECK.some((flag) => type.flags === flag);
 }

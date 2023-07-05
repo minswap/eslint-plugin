@@ -1,9 +1,10 @@
 import {
-  TSESTree,
   AST_NODE_TYPES,
-  ParserServices,
   ESLintUtils,
+  ParserServices,
+  TSESTree,
 } from "@typescript-eslint/utils";
+import { RuleContext } from "@typescript-eslint/utils/dist/ts-eslint";
 
 // fake url for now
 export const createRule = ESLintUtils.RuleCreator(
@@ -98,10 +99,13 @@ export function findParentFunctionBody(
 }
 
 export function getCallExpressionReturnType(
-  parserServices: ParserServices,
+  context: RuleContext<string, unknown[]>,
   node: TSESTree.CallExpression
 ): string | null {
+  const parserServices = getParserServices(context);
+  if (!parserServices) return null;
   const typeChecker = parserServices.program.getTypeChecker();
+
   // Get the TypeScript type of the CallExpression
   const type = typeChecker.getTypeAtLocation(
     parserServices.esTreeNodeToTSNodeMap.get(node.callee)
@@ -135,4 +139,14 @@ export function getVariableDeclaration(
     }
   }
   return undefined;
+}
+
+export function getParserServices(
+  context: RuleContext<string, unknown[]>
+): ParserServices | null {
+  const parserServices = context.parserServices;
+  if (!parserServices || !parserServices.program) {
+    return null;
+  }
+  return parserServices;
 }

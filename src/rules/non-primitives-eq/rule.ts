@@ -20,7 +20,7 @@ export default createRule({
   create(context) {
     return {
       BinaryExpression(node) {
-        if (isNonPrimitiveComparison(node)) {
+        if (isNonPrimitiveComparison(node, context)) {
           context.report({
             node,
             messageId: "nonPrimitivesEq",
