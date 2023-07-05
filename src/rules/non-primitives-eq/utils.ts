@@ -1,4 +1,5 @@
 import { AST_NODE_TYPES, TSESTree } from "@typescript-eslint/utils";
+
 import { findParentFunctionBody, getVariableDeclaration } from "../utils";
 
 export function isNonPrimitiveComparison(node: TSESTree.Node) {

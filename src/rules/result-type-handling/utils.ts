@@ -1,10 +1,11 @@
 import { AST_NODE_TYPES, TSESTree } from "@typescript-eslint/utils";
+import { RuleContext } from "@typescript-eslint/utils/dist/ts-eslint";
+
 import {
   getBinaryExpression,
   getCallExpressionReturnType,
   isMemberExpressionIdentifier,
 } from "../utils";
-import { RuleContext } from "@typescript-eslint/utils/dist/ts-eslint";
 
 export const RESULT_PROPERTIES = ["ok", "err"];
 

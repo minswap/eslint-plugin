@@ -6,14 +6,12 @@ export default createRule({
   meta: {
     type: "suggestion",
     docs: {
-      description:
-        "Prevents non-primitives from being compared with the equality/deep equality operator",
+      description: "Prevents non-primitives from being compared with the equality/deep equality operator",
       recommended: "warn",
     },
     schema: [],
     messages: {
-      nonPrimitivesEq:
-        "Avoid === comparison with objects and arrays. Only allow comparison for primitive types.",
+      nonPrimitivesEq: "Avoid === comparison with objects and arrays. Only allow comparison for primitive types.",
     },
   },
   defaultOptions: [],
