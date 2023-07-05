@@ -1,9 +1,4 @@
-import {
-  AST_NODE_TYPES,
-  ESLintUtils,
-  ParserServices,
-  TSESTree,
-} from "@typescript-eslint/utils";
+import { AST_NODE_TYPES, ESLintUtils, ParserServices, TSESTree } from "@typescript-eslint/utils";
 import { RuleContext } from "@typescript-eslint/utils/dist/ts-eslint";
 
 // fake url for now
@@ -83,7 +78,7 @@ export function findParentFunctionBody(node: TSESTree.Node): TSESTree.Statement[
 
 export function getCallExpressionReturnType(
   context: RuleContext<string, unknown[]>,
-  node: TSESTree.CallExpression
+  node: TSESTree.CallExpression,
 ): string | null {
   const parserServices = getParserServices(context);
   if (!parserServices) return null;
@@ -102,13 +97,10 @@ export function getCallExpressionReturnType(
 
 export function getVariableDeclaration(
   functionBody: TSESTree.Statement[],
-  variableName: string
+  variableName: string,
 ): TSESTree.VariableDeclarator | undefined {
   for (const statement of functionBody) {
-    if (
-      statement.type === TSESTree.AST_NODE_TYPES.VariableDeclaration &&
-      statement.declarations.length > 0
-    ) {
+    if (statement.type === TSESTree.AST_NODE_TYPES.VariableDeclaration && statement.declarations.length > 0) {
       const declaration = statement.declarations[0];
       if (declaration.type === AST_NODE_TYPES.VariableDeclarator) {
         if (declaration.id.type === AST_NODE_TYPES.Identifier) {
@@ -122,9 +114,7 @@ export function getVariableDeclaration(
   return undefined;
 }
 
-export function getParserServices(
-  context: RuleContext<string, unknown[]>
-): ParserServices | null {
+export function getParserServices(context: RuleContext<string, unknown[]>): ParserServices | null {
   const parserServices = context.parserServices;
   if (!parserServices || !parserServices.program) {
     return null;

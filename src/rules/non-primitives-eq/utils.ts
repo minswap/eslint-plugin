@@ -1,41 +1,26 @@
 import { TSESTree } from "@typescript-eslint/utils";
+import { RuleContext } from "@typescript-eslint/utils/dist/ts-eslint";
 import ts from "typescript";
+
 import { getParserServices } from "../utils";
 
-import { RuleContext } from "@typescript-eslint/utils/dist/ts-eslint";
-
-export function isNonPrimitiveComparison(
-  node: TSESTree.BinaryExpression,
-  context: RuleContext<string, unknown[]>
-) {
+export function isNonPrimitiveComparison(node: TSESTree.BinaryExpression, context: RuleContext<string, unknown[]>) {
   let isNonPrimitive = false;
   const parserServices = getParserServices(context);
   if (!parserServices) return false;
   const typeChecker = parserServices.program.getTypeChecker();
 
-  if (
-    node.operator === "===" ||
-    node.operator === "==" ||
-    node.operator === "!==" ||
-    node.operator === "!="
-  ) {
+  if (node.operator === "===" || node.operator === "==" || node.operator === "!==" || node.operator === "!=") {
     const left = node.left;
-    const leftType = typeChecker.getTypeAtLocation(
-      parserServices.esTreeNodeToTSNodeMap.get(left)
-    );
+    const leftType = typeChecker.getTypeAtLocation(parserServices.esTreeNodeToTSNodeMap.get(left));
     const right = node.right;
-    const rightType = typeChecker.getTypeAtLocation(
-      parserServices.esTreeNodeToTSNodeMap.get(right)
-    );
+    const rightType = typeChecker.getTypeAtLocation(parserServices.esTreeNodeToTSNodeMap.get(right));
     // check if either side is an object/array
-    isNonPrimitive =
-      isNonPrimitiveType(leftType) || isNonPrimitiveType(rightType);
+    isNonPrimitive = isNonPrimitiveType(leftType) || isNonPrimitiveType(rightType);
     if (isNonPrimitive) {
       // check if both sides are not undefined/null/never/any/unknown/union
       // bc obj !== null can be a valid comparison
-      isNonPrimitive =
-        !isSafeNonPrimitiveCheck(leftType) &&
-        !isSafeNonPrimitiveCheck(rightType);
+      isNonPrimitive = !isSafeNonPrimitiveCheck(leftType) && !isSafeNonPrimitiveCheck(rightType);
     }
   }
   return isNonPrimitive;
