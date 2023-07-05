@@ -1,23 +1,13 @@
-import {
-  TSESTree,
-  AST_NODE_TYPES,
-  ParserServices,
-  ESLintUtils,
-} from "@typescript-eslint/utils";
+import { AST_NODE_TYPES, ESLintUtils, ParserServices, TSESTree } from "@typescript-eslint/utils";
 
 // fake url for now
-export const createRule = ESLintUtils.RuleCreator(
-  (name) => `https://eslint.minswap.org/rules/${name}`
-);
+export const createRule = ESLintUtils.RuleCreator((name) => `https://eslint.minswap.org/rules/${name}`);
 
 export function getBinaryExpression(statement: TSESTree.Statement): {
   left: TSESTree.Expression | TSESTree.PrivateIdentifier;
   right: TSESTree.Expression;
 } | null {
-  if (
-    statement.type === AST_NODE_TYPES.IfStatement &&
-    statement.test.type === AST_NODE_TYPES.BinaryExpression
-  ) {
+  if (statement.type === AST_NODE_TYPES.IfStatement && statement.test.type === AST_NODE_TYPES.BinaryExpression) {
     return {
       left: statement.test.left,
       right: statement.test.right,
@@ -35,10 +25,7 @@ export function getBinaryExpression(statement: TSESTree.Statement): {
   return null;
 }
 
-export function isMemberExpressionIdentifier(
-  node: TSESTree.Node,
-  name: string
-): boolean {
+export function isMemberExpressionIdentifier(node: TSESTree.Node, name: string): boolean {
   return (
     node.type === AST_NODE_TYPES.MemberExpression &&
     node.object.type === AST_NODE_TYPES.Identifier &&
@@ -59,9 +46,7 @@ export function isReturnStatement(node: TSESTree.Node | undefined): boolean {
   return false;
 }
 
-export function isVariableDeclaration(
-  node: TSESTree.Node | undefined
-): string | false {
+export function isVariableDeclaration(node: TSESTree.Node | undefined): string | false {
   if (node && node.type === AST_NODE_TYPES.VariableDeclarator) {
     const variableName = getVariableName(node);
     if (variableName) return variableName;
@@ -69,9 +54,7 @@ export function isVariableDeclaration(
   return false;
 }
 
-export function getVariableName(
-  node: TSESTree.Node | undefined
-): string | undefined {
+export function getVariableName(node: TSESTree.Node | undefined): string | undefined {
   if (node && node.type === AST_NODE_TYPES.VariableDeclarator) {
     if (node.id.type === AST_NODE_TYPES.Identifier) {
       return node.id.name;
@@ -80,16 +63,11 @@ export function getVariableName(
   return undefined;
 }
 
-export function findParentFunctionBody(
-  node: TSESTree.Node
-): TSESTree.Statement[] | undefined {
+export function findParentFunctionBody(node: TSESTree.Node): TSESTree.Statement[] | undefined {
   let currentNode: TSESTree.Node | undefined = node.parent;
   while (currentNode) {
     // TODO: Add support for arrow functions
-    if (
-      currentNode.type === AST_NODE_TYPES.BlockStatement ||
-      currentNode.type === AST_NODE_TYPES.Program
-    ) {
+    if (currentNode.type === AST_NODE_TYPES.BlockStatement || currentNode.type === AST_NODE_TYPES.Program) {
       return currentNode.body;
     }
     currentNode = currentNode.parent;
@@ -99,13 +77,11 @@ export function findParentFunctionBody(
 
 export function getCallExpressionReturnType(
   parserServices: ParserServices,
-  node: TSESTree.CallExpression
+  node: TSESTree.CallExpression,
 ): string | null {
   const typeChecker = parserServices.program.getTypeChecker();
   // Get the TypeScript type of the CallExpression
-  const type = typeChecker.getTypeAtLocation(
-    parserServices.esTreeNodeToTSNodeMap.get(node.callee)
-  );
+  const type = typeChecker.getTypeAtLocation(parserServices.esTreeNodeToTSNodeMap.get(node.callee));
 
   // Get the return type of the CallExpression
   const typeSignatures = type.getCallSignatures();
@@ -117,13 +93,10 @@ export function getCallExpressionReturnType(
 
 export function getVariableDeclaration(
   statements: TSESTree.Statement[],
-  variableName: string
+  variableName: string,
 ): TSESTree.VariableDeclarator | undefined {
   for (const statement of statements) {
-    if (
-      statement.type === TSESTree.AST_NODE_TYPES.VariableDeclaration &&
-      statement.declarations.length > 0
-    ) {
+    if (statement.type === TSESTree.AST_NODE_TYPES.VariableDeclaration && statement.declarations.length > 0) {
       const declaration = statement.declarations[0];
       if (declaration.type === AST_NODE_TYPES.VariableDeclarator) {
         if (declaration.id.type === AST_NODE_TYPES.Identifier) {

@@ -57,6 +57,8 @@ mkdir -p "$rule_path/$rule_name"
 echo 'export { default } from "./rule";' > "$rule_path/$rule_name/index.ts"
 
 cat <<EOF > "$rule_path/$rule_name/rule.ts"
+import { RuleModule } from "@typescript-eslint/utils/dist/ts-eslint";
+
 import { createRule } from "../utils";
 
 export default createRule({
@@ -77,7 +79,7 @@ export default createRule({
   create(context) {
     return {};
   },
-});
+}) as RuleModule<string, never[]>;
 EOF
 
 echo "Directory '$rule_name' created at '$path'."

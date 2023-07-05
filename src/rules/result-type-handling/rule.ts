@@ -1,11 +1,7 @@
 import { AST_NODE_TYPES } from "@typescript-eslint/utils";
-import {
-  createRule,
-  findParentFunctionBody,
-  getParent,
-  isReturnStatement,
-  isVariableDeclaration,
-} from "../utils";
+import { RuleModule } from "@typescript-eslint/utils/dist/ts-eslint";
+
+import { createRule, findParentFunctionBody, getParent, isReturnStatement, isVariableDeclaration } from "../utils";
 import {
   doesUnwrap,
   isOkOrErr,
@@ -20,8 +16,7 @@ export default createRule({
   meta: {
     type: "suggestion",
     docs: {
-      description:
-        "Require that function calling functions that return a Result type must handle the result",
+      description: "Require that function calling functions that return a Result type must handle the result",
       recommended: "warn",
     },
     schema: [],
@@ -79,9 +74,7 @@ export default createRule({
             // get the function body of the variable declaration
             const functionBody = findParentFunctionBody(node);
             if (functionBody) {
-              const index = functionBody?.findIndex(
-                (statement) => statement === node.parent?.parent
-              );
+              const index = functionBody?.findIndex((statement) => statement === node.parent?.parent);
               // get statements after the variable declaration
               const restStatements = functionBody.slice(index + 1);
               /**
@@ -97,12 +90,10 @@ export default createRule({
                * If non above conidtion is true - REPORT ERROR!
                */
               // see test4(), test5() in test/result-handling.test.ts
-              const unwrap = restStatements.some((statement) =>
-                doesUnwrap(statement, variableName)
-              );
+              const unwrap = restStatements.some((statement) => doesUnwrap(statement, variableName));
 
               const doesResultTypeCheck = restStatements.some((statement) =>
-                isResultTypeCheck(statement, variableName)
+                isResultTypeCheck(statement, variableName),
               );
 
               // see test6() in test/result-handling.test.ts
@@ -110,7 +101,7 @@ export default createRule({
                 (statement) =>
                   statement.type === AST_NODE_TYPES.ReturnStatement &&
                   statement.argument?.type === AST_NODE_TYPES.Identifier &&
-                  statement.argument.name === variableName
+                  statement.argument.name === variableName,
               );
 
               if (!unwrap && !doesReturn && !doesResultTypeCheck) {
@@ -141,4 +132,4 @@ export default createRule({
       },
     };
   },
-});
+}) as RuleModule<string, never[]>;

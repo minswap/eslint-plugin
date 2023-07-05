@@ -33,7 +33,7 @@ const resultTypeDeclaration = `
   }
 `;
 
-const wrapResultDeclaration = (code: string) => `
+const wrapResultDeclaration = (code: string): string => `
   ${resultTypeDeclaration}
   ${code}
 `;

@@ -6,7 +6,9 @@
   "scripts": {
     "clean": "rm -Rf ./dist/",
     "build": "npm run clean && mkdir ./dist && tsc --project tsconfig.build.json",
-    "test": "jest"
+    "test": "jest",
+    "format": "prettier --write src/**/* && eslint --fix --ext .ts .",
+    "check-format": "prettier --check src/**/* && eslint --ext .ts ."
   },
   "keywords": [],
   "author": "",
@@ -20,9 +22,16 @@
     "@babel/preset-typescript": "^7.22.5",
     "@types/eslint": "^8.40.2",
     "@types/jest": "^29.5.2",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.60.1",
     "eslint": "^8.43.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "eslint-plugin-unicorn": "^47.0.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
     "jest": "^29.5.0",
+    "prettier": "^2.8.8",
     "typescript": "^5.1.5"
   }
 }
