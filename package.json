@@ -7,9 +7,8 @@
     "clean": "rm -Rf ./dist/",
     "build": "npm run clean && mkdir ./dist && tsc --project tsconfig.build.json",
     "test": "jest",
-    "lint": "eslint --ext .ts . --fix",
-    "format": "prettier --write **/*.{ts,tsx} && eslint --fix --ext .ts,.tsx .",
-    "check-format": "prettier --check **/*.{ts,tsx} && eslint --ext .ts,.tsx ."
+    "format": "prettier --write src/**/* && eslint --fix --ext .ts .",
+    "check-format": "prettier --check src/**/* && eslint --ext .ts ."
   },
   "keywords": [],
   "author": "",

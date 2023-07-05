@@ -1,11 +1,7 @@
 import { AST_NODE_TYPES, TSESTree } from "@typescript-eslint/utils";
 import { RuleContext } from "@typescript-eslint/utils/dist/ts-eslint";
 
-import {
-  getBinaryExpression,
-  getCallExpressionReturnType,
-  isMemberExpressionIdentifier,
-} from "../utils";
+import { getBinaryExpression, getCallExpressionReturnType, isMemberExpressionIdentifier } from "../utils";
 
 export const RESULT_PROPERTIES = ["ok", "err"];
 
@@ -13,18 +9,12 @@ export const RESULT_TYPES = ["Ok", "Err"];
 
 export const RESULT_TYPE_NAME = "Result";
 
-export function isResultTypeCheck(
-  statement: TSESTree.Statement,
-  variableName: string
-): boolean {
+export function isResultTypeCheck(statement: TSESTree.Statement, variableName: string): boolean {
   // TODO: Add switch case
   const binaryExpr = getBinaryExpression(statement);
   if (binaryExpr) {
     const { left, right } = binaryExpr;
-    if (
-      isMemberExpressionIdentifier(left, variableName) &&
-      isLiteralWithResultProperty(right)
-    ) {
+    if (isMemberExpressionIdentifier(left, variableName) && isLiteralWithResultProperty(right)) {
       return true;
     }
   }
@@ -33,9 +23,7 @@ export function isResultTypeCheck(
 
 export function isLiteralWithResultProperty(node: TSESTree.Node): boolean {
   return (
-    node.type === AST_NODE_TYPES.Literal &&
-    typeof node.value === "string" &&
-    RESULT_PROPERTIES.includes(node.value)
+    node.type === AST_NODE_TYPES.Literal && typeof node.value === "string" && RESULT_PROPERTIES.includes(node.value)
   );
 }
 
@@ -45,9 +33,7 @@ export function isOkOrErr(node: TSESTree.CallExpression): boolean {
       if (node.callee.object.name === RESULT_TYPE_NAME) {
         if (node.callee.property.type === AST_NODE_TYPES.Identifier) {
           const propertyName = node.callee.property.name;
-          if (
-            RESULT_PROPERTIES.some((resultType) => propertyName === resultType)
-          ) {
+          if (RESULT_PROPERTIES.some((resultType) => propertyName === resultType)) {
             return true;
           }
         }
@@ -83,10 +69,7 @@ export function isUnwrapCallExpr(node: TSESTree.CallExpression): boolean {
   return false;
 }
 
-export function doesUnwrap(
-  node: TSESTree.Statement,
-  variableName: string
-): boolean {
+export function doesUnwrap(node: TSESTree.Statement, variableName: string): boolean {
   let unwrapStatement = isUnwrapStatment(node, variableName);
   if (node.type === AST_NODE_TYPES.VariableDeclaration) {
     const declaration = node.declarations[0].init;
@@ -97,10 +80,7 @@ export function doesUnwrap(
   return unwrapStatement;
 }
 
-export function isUnwrapStatment(
-  statement: TSESTree.Statement,
-  variableName: string
-): boolean {
+export function isUnwrapStatment(statement: TSESTree.Statement, variableName: string): boolean {
   return (
     statement.type === AST_NODE_TYPES.ExpressionStatement &&
     statement.expression.type === AST_NODE_TYPES.CallExpression &&
@@ -117,17 +97,14 @@ export function isUnwrapStatment(
 
 export function isResultType(
   context: Readonly<RuleContext<"resultHandling", never[]>>,
-  node: TSESTree.CallExpression
+  node: TSESTree.CallExpression,
 ): boolean {
   const parserServices = context.parserServices;
   if (!parserServices || !parserServices.program) {
     return false;
   }
   const returnType = getCallExpressionReturnType(parserServices, node);
-  if (
-    returnType &&
-    RESULT_TYPES.some((resultType) => returnType.includes(resultType))
-  ) {
+  if (returnType && RESULT_TYPES.some((resultType) => returnType.includes(resultType))) {
     return true;
   }
   return false;
