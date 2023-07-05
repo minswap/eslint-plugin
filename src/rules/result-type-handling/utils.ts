@@ -1,6 +1,8 @@
 import { AST_NODE_TYPES, TSESTree } from "@typescript-eslint/utils";
 import { RuleContext } from "@typescript-eslint/utils/dist/ts-eslint";
 
+import { getBinaryExpression, getCallExpressionReturnType, isMemberExpressionIdentifier } from "../utils";
+
 export const RESULT_TYPE_NAME = "Result";
 
 const resultPropertyRegex = /^(ok|err)$/;
@@ -20,11 +22,7 @@ export function isResultTypeCheck(statement: TSESTree.Statement, variableName: s
 }
 
 export function isLiteralWithResultProperty(node: TSESTree.Node): boolean {
-  return (
-    node.type === AST_NODE_TYPES.Literal &&
-    typeof node.value === "string" &&
-    resultPropertyRegex.test(node.value)
-  );
+  return node.type === AST_NODE_TYPES.Literal && typeof node.value === "string" && resultPropertyRegex.test(node.value);
 }
 
 export function isOkOrErr(node: TSESTree.CallExpression): boolean {
