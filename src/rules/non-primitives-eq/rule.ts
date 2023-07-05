@@ -1,3 +1,5 @@
+import { RuleModule } from "@typescript-eslint/utils/dist/ts-eslint";
+
 import { createRule } from "../utils";
 import { isNonPrimitiveComparison } from "./utils";
 
@@ -37,4 +39,4 @@ export default createRule({
       },
     };
   },
-});
+}) as RuleModule<string, never[]>;

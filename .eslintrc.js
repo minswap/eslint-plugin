@@ -20,7 +20,6 @@ module.exports = {
         format: ["UPPER_CASE"],
       },
     ],
-    "@ast-spec": "off",
     "unused-imports/no-unused-imports": "error",
     "unused-imports/no-unused-vars": [
       "error",
