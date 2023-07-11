@@ -115,7 +115,7 @@ export function isUnwrapStatment(statement: TSESTree.Statement, variableName: st
 }
 
 export function isResultType(
-  context: Readonly<RuleContext<"resultHandling", never[]>>,
+  context: Readonly<RuleContext<"resultTypeHandling", never[]>>,
   node: TSESTree.CallExpression,
 ): boolean {
   const returnType = getCallExpressionReturnType(context, node);

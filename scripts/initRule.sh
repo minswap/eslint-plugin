@@ -84,13 +84,33 @@ EOF
 
 echo "Directory '$rule_name' created at '$path'."
 
-rule_import_name_suffix="Rule"
+import_name="$messageId"Rule
 
-index_path="$root/src/index.ts"  
-import_statement="import { $messageId$rule_import_name_suffix } from './$rule_name';"  
+# index_path="$root/src/index.ts"
+# import_statement="import { import_name } from './$rule_name';"
 
-last_import_line=$(grep -n "^\s*import\s" "$index_path" | tail -n 1 | cut -d ":" -f 1)
+# last_import_line=$(grep -n "^\s*import\s" "$index_path" | tail -n 1 | cut -d ":" -f 1)
 
-sed -i "$last_import_line"'a\'"$import_statement_to_add" "$index_path"
+# sed -i "$last_import_line"'a\'"$import_statement_to_add" "$index_path"
 
-echo "Import statement added to '$index_path'. Please add the rule to the rules array."
+# echo "Import statement added to '$index_path'. Please add the rule to the rules array."
+
+cat <<EOF > "$root/test/$rule_name.test.ts"
+import { ESLintUtils } from "@typescript-eslint/utils";
+
+const ruleTester = new ESLintUtils.RuleTester({
+  parser: "@typescript-eslint/parser",
+});
+
+import $import_name from "../src/rules/$rule_name";
+
+ruleTester.run("$description", $messageId, {
+  valid: [],
+  invalid: [
+    {
+      code: \`\`,
+      errors: [{ messageId: "$messageId" }],
+    },
+  ],
+});
+EOF
