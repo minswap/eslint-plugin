@@ -54,7 +54,7 @@ export default createRule({
           /**
            * If the parent of the call expression is unwrap - NO ERROR!
            *
-           * See test 2(), test3() in test/result-handling.test.ts
+           * See test 2(), test3(), test13() in test/result-handling.test.ts
            */
           if (isParentUnwrapCallExpr(node)) {
             return;
