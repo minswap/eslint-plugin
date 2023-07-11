@@ -15,6 +15,7 @@ export function getBinaryExpression(statement: TSESTree.Statement): {
     };
   } else if (statement.type === AST_NODE_TYPES.VariableDeclaration) {
     const declaration = statement.declarations[0].init;
+
     if (
       declaration &&
       declaration.type === AST_NODE_TYPES.ConditionalExpression &&
