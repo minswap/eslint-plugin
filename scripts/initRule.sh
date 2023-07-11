@@ -52,6 +52,8 @@ for ((i=0; i<${#words[@]}; i++)); do
   fi
 done
 
+# Create rule directory and files
+
 mkdir -p "$rule_path/$rule_name"
 
 echo 'export { default } from "./rule";' > "$rule_path/$rule_name/index.ts"
@@ -84,13 +86,38 @@ EOF
 
 echo "Directory '$rule_name' created at '$path'."
 
-rule_import_name_suffix="Rule"
+# Add import statement to index.ts
 
-index_path="$root/src/index.ts"  
-import_statement="import { $messageId$rule_import_name_suffix } from './$rule_name';"  
+import_name="$messageId"Rule
+import_statement="import $import_name from './$rule_name';"
+
+index_path="$root/src/rules/index.ts"
 
 last_import_line=$(grep -n "^\s*import\s" "$index_path" | tail -n 1 | cut -d ":" -f 1)
+last_import_line=$((last_import_line + 1))
 
-sed -i "$last_import_line"'a\'"$import_statement_to_add" "$index_path"
+awk -v line="$last_import_line" -v content="$import_statement" 'NR==line {print content} 1' $index_path > tmp.ts && cat tmp.ts && mv tmp.ts $index_path
 
 echo "Import statement added to '$index_path'. Please add the rule to the rules array."
+
+# Create test file
+
+cat <<EOF > "$root/test/$rule_name.test.ts"
+import { ESLintUtils } from "@typescript-eslint/utils";
+
+const ruleTester = new ESLintUtils.RuleTester({
+  parser: "@typescript-eslint/parser",
+});
+
+import $import_name from "../src/rules/$rule_name";
+
+ruleTester.run("$description", $import_name, {
+  valid: [],
+  invalid: [
+    {
+      code: \`\`,
+      errors: [{ messageId: "$messageId" }],
+    },
+  ],
+});
+EOF

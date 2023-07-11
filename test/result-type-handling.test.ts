@@ -135,7 +135,7 @@ ruleTester.run("result handling", resultTypeHandlingRule, {
         return foo
       }
     `),
-      errors: [{ messageId: "resultHandling" }],
+      errors: [{ messageId: "resultTypeHandling" }],
     },
     {
       code: wrapResultDeclaration(`
@@ -145,7 +145,7 @@ ruleTester.run("result handling", resultTypeHandlingRule, {
         return a
       }
     `),
-      errors: [{ messageId: "resultHandling" }],
+      errors: [{ messageId: "resultTypeHandling" }],
     },
   ],
 });

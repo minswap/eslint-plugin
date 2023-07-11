@@ -21,7 +21,7 @@ export default createRule({
     },
     schema: [],
     messages: {
-      resultHandling: "All Result types must be handled.",
+      resultTypeHandling: "All Result types must be handled.",
     },
   },
   defaultOptions: [],
@@ -106,7 +106,7 @@ export default createRule({
               if (!unwrap && !doesReturn && !doesResultTypeCheck) {
                 context.report({
                   node,
-                  messageId: "resultHandling",
+                  messageId: "resultTypeHandling",
                 });
               }
             }
@@ -124,7 +124,7 @@ export default createRule({
           if (!returnStatement && !variableName) {
             context.report({
               node,
-              messageId: "resultHandling",
+              messageId: "resultTypeHandling",
             });
           }
         }
