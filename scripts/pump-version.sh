@@ -19,7 +19,7 @@ npm publish
 
 echo "commit new version"
 git add package.json package-lock.json
-git commit -m "publish version v$version"
+git commit -m "chore: publish version v$version"
 
 echo "tag version"
 git tag v"$version"
