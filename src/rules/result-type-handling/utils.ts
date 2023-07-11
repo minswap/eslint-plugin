@@ -11,7 +11,7 @@ const resultTypeRegex = /^(Result<.*, .*>|Err<\w+>\s\|\sOk<\w+>)$/;
 
 export function isResultTypeCheck(statement: TSESTree.Statement, variableName: string): boolean {
   // TODO: Add switch case
-  const binaryExpr = getBinaryExpression(statement);
+  const binaryExpr = getResultTypeBinaryExpr(statement);
   if (binaryExpr) {
     const { left, right } = binaryExpr;
     if (isMemberExpressionIdentifier(left, variableName) && isLiteralWithResultProperty(right)) {
@@ -19,6 +19,32 @@ export function isResultTypeCheck(statement: TSESTree.Statement, variableName: s
     }
   }
   return false;
+}
+
+export function getResultTypeBinaryExpr(statement: TSESTree.Statement) {
+  let binaryExpr = getBinaryExpression(statement);
+  if (!binaryExpr) {
+    binaryExpr = getInvariantCheckBinaryExpr(statement);
+  }
+  return binaryExpr;
+}
+
+export function getInvariantCheckBinaryExpr(statement: TSESTree.Statement): TSESTree.BinaryExpression | null {
+  if (statement.type === AST_NODE_TYPES.ExpressionStatement) {
+    if (statement.expression.type === AST_NODE_TYPES.CallExpression) {
+      if (statement.expression.callee.type === AST_NODE_TYPES.Identifier) {
+        if (statement.expression.callee.name === "invariant") {
+          if (statement.expression.arguments.length === 2) {
+            const firstArg = statement.expression.arguments[0];
+            if (firstArg.type === AST_NODE_TYPES.BinaryExpression) {
+              return firstArg;
+            }
+          }
+        }
+      }
+    }
+  }
+  return null;
 }
 
 export function isLiteralWithResultProperty(node: TSESTree.Node): boolean {

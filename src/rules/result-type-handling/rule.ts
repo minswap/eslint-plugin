@@ -95,7 +95,6 @@ export default createRule({
               const doesResultTypeCheck = restStatements.some((statement) =>
                 isResultTypeCheck(statement, variableName),
               );
-
               // see test6() in test/result-handling.test.ts
               const doesReturn = restStatements.some(
                 (statement) =>

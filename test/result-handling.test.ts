@@ -118,6 +118,13 @@ ruleTester.run("result handling", resultTypeHandlingRule, {
         return ResultWrap.Result.unwrap(getResult(0))
       }
     `),
+    wrapResultDeclaration(`
+      function test14() {
+        const res = getResult()
+        invariant(res.type === "err", 'error')
+        return a
+      }
+    `),
   ],
   invalid: [
     {
@@ -126,6 +133,16 @@ ruleTester.run("result handling", resultTypeHandlingRule, {
         const foo = 1
         getResult()
         return foo
+      }
+    `),
+      errors: [{ messageId: "resultHandling" }],
+    },
+    {
+      code: wrapResultDeclaration(`
+      function test15() {
+        const res = getResult()
+        const a = selectUtxosResult.type === "err" && "1";
+        return a
       }
     `),
       errors: [{ messageId: "resultHandling" }],
